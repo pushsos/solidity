@@ -15,6 +15,21 @@
 ## It will clone the Solidity git from github, determine the version,
 ## create a source archive and push it to the ubuntu ppa servers.
 ##
+## This requires the following entries in /etc/dput.cf:
+##
+##  [ethereum-dev]
+##  fqdn			= ppa.launchpad.net
+##  method			= ftp
+##  incoming		= ~ethereum/ethereum-dev
+##  login			= anonymous
+## 
+##  [ethereum]
+##  fqdn			= ppa.launchpad.net
+##  method			= ftp
+##  incoming		= ~ethereum/ethereum
+##  login			= anonymous
+
+##
 ##############################################################################
 
 set -ev
@@ -28,10 +43,10 @@ fi
 
 if [ "$branch" = develop ]
 then
-    pparepo=ethereum/ethereum-dev
+    pparepo=ethereum-dev
     ppafilesurl=https://launchpad.net/~ethereum/+archive/ubuntu/ethereum-dev/+files
 else
-    pparepo=ethereum/ethereum
+    pparepo=ethereum
     ppafilesurl=https://launchpad.net/~ethereum/+archive/ubuntu/ethereum/+files
 fi
 
@@ -89,7 +104,7 @@ Priority: extra
 Maintainer: Christian (Buildserver key) <builds@ethereum.org>
 Build-Depends: debhelper (>= 9.0.0),
                cmake,
-               g++-4.8,
+               g++-6,
                git,
                libgmp-dev,
                libboost-all-dev,
@@ -223,6 +238,6 @@ fi
 debsign --re-sign -k ${keyid} ../${packagename}_${debversion}-${versionsuffix}_source.changes
 
 # upload
-dput ppa:${pparepo} ../${packagename}_${debversion}-${versionsuffix}_source.changes
+dput ${pparepo} ../${packagename}_${debversion}-${versionsuffix}_source.changes
 
 done
